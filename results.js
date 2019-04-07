@@ -9,61 +9,16 @@ exports.getResults = function (conv, datetime, lat, lon){
     // conv.ask(`${tmp}`);
 
 
+    let res = {}
 
-    let res =
-        {
-            "bestNearest": {
-                "shop": {
-                    "id": 1,
-                    "name": "Biedronka Zygmunta Miłkowskiego 3/4",
-                    "address": "Zygmunta Miłkowskiego 3/4",
-                    "openingHour": "06:00:00",
-                    "closingHour": "23:00:00",
-                    "lat": 52.750594,
-                    "lng": 23.587002,
-                    "openOnSundays": false,
-                    "query": "Biedronka+Milkowskiego+Krakow",
-                    "data": "",
-                    "trafficData": null
-                },
-                "recommendedHour": 22,
-                "bestTraffic": 0
-            },
-            "bestNow": {
-                "shop": {
-                    "id": 1,
-                    "name": "Biedronka Zygmunta Miłkowskiego 3/4",
-                    "address": "Zygmunta Miłkowskiego 3/4",
-                    "openingHour": "06:00:00",
-                    "closingHour": "23:00:00",
-                    "lat": 52.750594,
-                    "lng": 23.587002,
-                    "openOnSundays": false,
-                    "query": "Biedronka+Milkowskiego+Krakow",
-                    "data": "",
-                    "trafficData": null
-                },
-                "recommendedHour": 16,
-                "bestTraffic": -1
-            },
-            "bestOverall": {
-                "shop": {
-                    "id": 1,
-                    "name": "Biedronka Zygmunta Miłkowskiego 3/4",
-                    "address": "Zygmunta Miłkowskiego 3/4",
-                    "openingHour": "06:00:00",
-                    "closingHour": "23:00:00",
-                    "lat": 52.750594,
-                    "lng": 23.587002,
-                    "openOnSundays": false,
-                    "query": "Biedronka+Milkowskiego+Krakow",
-                    "data": "",
-                    "trafficData": null
-                },
-                "recommendedHour": 16,
-                "bestTraffic": -1
-            },
-        };
+    axios.get(`https://03f259e9.ngrok.io/api/best_shop?date_time=${time}&lat=${lat}&lng=${lng}`)
+    .then(response => {
+        res = response.body()
+    })
+    .catch(err => {
+        console.log(err.message);
+        
+    })
 
     let userLat = conv.user.storage.homeLat;
     let userLon = conv.user.storage.homeLon;
@@ -72,53 +27,7 @@ exports.getResults = function (conv, datetime, lat, lon){
     let urlNow =  "https://www.google.com/maps/dir/?api=1&origin=" + userLat + "+" + userLon + "&destination=" + res.bestNow.shop.lat + "+" + res.bestNow.shop.lng + "&travelmode=walking";
     let urlNearest =  "https://www.google.com/maps/dir/?api=1&origin=" + userLat + "+" + userLon + "&destination=" + res.bestNearest.shop.lat + "+" + res.bestNearest.shop.lng + "&travelmode=walking";
 
-    // let toReturn = new List({
-    //     title: 'Optymalna',
-    //     items: {
-    //         // Add the first item to the list
-    //         'SELECTION_KEY_OPTIMAL': {
-    //             synonyms: [
-    //                 'optymalna',
-    //                 'opcja optymalna',
-    //                 'wybieram pierwszą'
-    //             ],
-    //             title: 'Optymalna',
-    //             description: '' + res.bestOverall + '\n Czas przejścia: \n Czas oczekiwania w kolejce: ',
-    //             image: new Image({
-    //                 url: 'https://i.ibb.co/BKq1dgy/baseline-star-border-black-48dp.png',
-    //                 alt: 'Image alternate text',
-    //             }),
-    //         },
-    //         // Add the second item to the list
-    //         'SELECTION_KEY_FASTEST': {
-    //             synonyms: [
-    //                 'opcja druga',
-    //                 'opcja najszybsza'
-    //             ],
-    //             title: 'Najszybsza',
-    //             description: '' + res.bestNow.shop.name +  '\n Czas przejścia: \n Czas oczekiwania w kolejce: ',
-    //             image: new Image({
-    //                 url: 'https://i.ibb.co/1L8DH75/baseline-access-time-black-48dp.png',
-    //                 alt: 'Image alternate text',
-    //             }),
-    //
-    //         },
-    //         // Add the third item to the list
-    //         'SELECTION_KEY_COMFY': {
-    //             synonyms: [
-    //                 'Wygodna',
-    //                 'Opcja wygodna',
-    //                 'Wybieram trzecią'
-    //             ],
-    //             title: 'Wygodna',
-    //             description: '' + res.bestNearest.shop.name +  '\n Czas przejścia: \n Czas oczekiwania w kolejce: ',
-    //             image: new Image({
-    //                 url: 'https://i.ibb.co/Lv1JdmB/baseline-mood-black-48dp.png',
-    //                 alt: 'Image alternate text',
-    //             }),
-    //         },
-    //     },
-    // });
+ 
 
     let toReturn = new BrowseCarousel({
         items: [
