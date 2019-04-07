@@ -1,56 +1,25 @@
-const express = require("express");
-const { WebhookClient } = require("dialogflow-fulfillment");
-const { Card, Suggestion } = require("dialogflow-fulfillment");
-const {Permission, dialogflow} = require("actions-on-google");
-const dialogflowApp = dialogflow({debug: true});
-const app = express();
+const { dialogflow } = require('actions-on-google');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-app.get("/", (req, res) => res.send("online"));
-app.post("/dialogflow", express.json(), (req, res) => {
-  const agent = new WebhookClient({ request: req, response: res });
+const welcome = require('./welcome');
+const shoppingHour = require('./shoppingHour');
+const shoppingHourHome = require('./shoppingHourHome');
+const getHomeAddress = require('./getHomeAddress');
+const shoppingHourHere = require('./shoppingHourHere');
+const locationPermission = require('./locationPermission');
+// const whereToShop = require('whereToShop');
 
-  function welcome() {
-    agent.add("Witaj w QWise");
-  }
+const app = dialogflow({ debug: true });
 
-    function shopingHour(params) {
-        console.log(params.parameters.when);
-        agent.add("Z domu czy z obecnej lokalizacji?");
-    }
+app.intent('Default Welcome Intent', welcome);
+app.intent('shopping on specific hour', shoppingHour);
+app.intent('shopping on specific hour - home', shoppingHourHome);
+app.intent('shopping on specific hour - home - address', getHomeAddress);
+app.intent('shopping on specific hour - here', shoppingHourHere);
+app.intent('shopping on specific hour - here - permission', locationPermission);
+// app.intent('where to shop', whereToShop);
 
-    function shopingHourLocationHere() {
-        console.log(here);
-        const options = {
-            context: 'Aby odpowiedzieć ',
-            // Ask for more than one permission. User can authorize all or none.
-            permissions: ['NAME', 'DEVICE_PRECISE_LOCATION'],
-        };
-        agent.add(new Permission(options));
-    }
+express().use(bodyParser.json(), app).listen(process.env.PORT || 8080);
 
 
-    // 'ask_for_permission_confirmation': (conv, params, confirmationGranted) => {
-    //     const {location} = conv.device;
-    //     const {name} = conv.user;
-    //     if (confirmationGranted) {
-    //         if (name) {
-    //             conv.ask(`I'll send the driver your way now ${name.display}.`);
-    //         }
-    //         if (location) {
-    //             // const { latitude, longitude } = location.coordinates;
-    //             // you can uncomment the above lines and use the latitude and longitude
-    //         }
-    //     } else {
-    //         conv.ask(`Okay, yeah that's fine. I... didn't really want it anyway.`);
-    //     }
-    // },
-    // }
-
-  let intentMap = new Map();
-  intentMap.set("Default Welcome Intent", welcome);
-  intentMap.set("shopping on specific hour", shopingHour);
-  intentMap.set("shopping on specific hour - here", shopingHourLocationHere);
-  agent.handleRequest(intentMap);
-});
-
-app.listen(process.env.PORT || 8080);
